@@ -1,0 +1,87 @@
+﻿@page
+@model RegisterModel
+
+@{
+    // Set the page title
+    ViewData["Title"] = "Register";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+<body>
+  
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+        <!-- Card to hold the registration form -->
+        <div class="card shadow-lg p-4" style="width: 500px; background-color: rgba(255, 255, 255, 0.85);">
+            <div class="card-body">
+
+                <!-- Form title -->
+                <h2 class="text-center mb-4">Register</h2>
+
+                <!-- Registration form -->
+                <form method="post">
+
+                    <!-- First Name input field -->
+                    <div class="form-group mb-3">
+                        <label for="Firstname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="Firstname" asp-for="Input.Firstname" required />
+                        <span asp-validation-for="Input.Firstname" class="text-danger"></span>
+                    </div>
+
+                    <!-- Last Name input field -->
+                    <div class="form-group mb-3">
+                        <label for="Lastname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="Lastname" asp-for="Input.Lastname" required />
+                        <span asp-validation-for="Input.Lastname" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email input field -->
+                    <div class="form-group mb-3">
+                        <label for="Email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="Email" asp-for="Input.Email" required />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password input field -->
+                    <div class="form-group mb-3">
+                        <label for="Password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="Password" asp-for="Input.Password" required />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Confirm Password input field -->
+                    <div class="form-group mb-3">
+                        <label for="ConfirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="ConfirmPassword" asp-for="Input.ConfirmPassword" required />
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <!-- Role selection dropdown -->
+                    <div class="form-floating mb-3">
+                        <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select" aria-required="true" placeholder="password">
+                            <option disabled selected>Select Role</option>
+                        </select>
+
+                        <span asp-validation-for="Input.Role" class="text-danger"></span>
+                    </div>
+
+                    <!-- Register button -->
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+
+                <!-- Link to Login page -->
+                <div class="text-center mt-3">
+                    <a asp-page="./Login">Already have an account? Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

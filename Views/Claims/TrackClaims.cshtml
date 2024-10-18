@@ -1,0 +1,46 @@
+﻿@model IEnumerable<PartTwoProg.Models.Claim>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Your Claims</title>
+</head>
+<body>
+    <h2>Track Your Claims</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Lecturer Name</th>
+                <th>Hours Worked</th>
+                <th>Hourly Rate</th>
+                <th>AdditionalNotes</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model)
+            {
+                <tr>
+                    <td>@claim.LecturerName</td>
+                    <td>@claim.HoursWorked</td>
+                    <td>@claim.HourlyRate</td>
+                    <td>@claim.AdditionalNotes</td>
+                    <td>@claim.Status</td>
+                    <td>
+                        @if (User.IsInRole("Manager") || User.IsInRole("Co-ordinator"))
+                        {
+                            <form asp-action="DeleteClaim" method="post">
+                                <input type="hidden" name="id" value="@claim.Id" />
+                                <button type="submit">Delete</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
