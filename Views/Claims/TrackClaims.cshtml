@@ -1,46 +1,61 @@
 ﻿@model IEnumerable<PartTwoProg.Models.Claim>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Track Your Claims</title>
-</head>
-<body>
-    <h2>Track Your Claims</h2>
-    <table>
-        <thead>
+@{
+    ViewData["Title"] = "Track Claims";
+}
+
+<h2>Track Claims</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Lecturer Name</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate</th>
+            <th>Total Salary</th>
+            <th>Additional Notes</th>
+            <th>Supporting Document</th>
+            <th>Status</th>
+            <th>Actions</th> <!-- For actions like Delete if applicable -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
             <tr>
-                <th>Lecturer Name</th>
-                <th>Hours Worked</th>
-                <th>Hourly Rate</th>
-                <th>AdditionalNotes</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var claim in Model)
-            {
-                <tr>
-                    <td>@claim.LecturerName</td>
-                    <td>@claim.HoursWorked</td>
-                    <td>@claim.HourlyRate</td>
-                    <td>@claim.AdditionalNotes</td>
-                    <td>@claim.Status</td>
-                    <td>
-                        @if (User.IsInRole("Manager") || User.IsInRole("Co-ordinator"))
+                <td>@claim.Id</td>
+                <td>@claim.LecturerName</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate.ToString("C")</td> <!-- Currency format -->
+                <td>@claim.TotalSalary.ToString("C")</td> <!-- New Column -->
+                <td>@claim.AdditionalNotes</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(claim.SupportingDocument))
+                    {
+                        <a href="@claim.SupportingDocument" target="_blank">View Document</a>
+                    }
+                </td>
+                <td>@claim.Status</td>
+                <td>
+                    @* Example actions *@
+                    @if (User.IsInRole("Coordinator") || User.IsInRole("Manager"))
+                    {
+                        if (claim.Status == "Pending")
                         {
-                            <form asp-action="DeleteClaim" method="post">
+                            <form asp-action="ApproveClaim" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="@claim.Id" />
-                                <button type="submit">Delete</button>
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form asp-action="RejectClaim" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@claim.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                             </form>
                         }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</body>
-</html>
+                    }
+                    @* Add more actions as needed *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -9,5 +9,15 @@
         public string AdditionalNotes { get; set; }
         public string SupportingDocument { get; set; }
         public string Status { get; set; } = "Pending"; // Initial status
+        public string UserId { get; set; } // Link the claim to the user
+
+        // Calculated property
+        public decimal TotalSalary => HoursWorked * HourlyRate;
+
+        // Validation logic (static to keep the model clean)
+        public static bool IsOverLimit(decimal hourlyRate, decimal hoursWorked, decimal limit)
+        {
+            return hourlyRate * hoursWorked > limit;
+        }
     }
 }

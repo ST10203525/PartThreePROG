@@ -21,7 +21,7 @@ public class ClaimsController : Controller
         _dbContext = dbContext;
     }
 
-    
+
     [HttpGet]
     public IActionResult SubmitClaim()
     {
@@ -32,6 +32,22 @@ public class ClaimsController : Controller
     [HttpPost]
     public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile document)
     {
+        var userId = User.Identity.Name; // Assuming User.Identity.Name contains the username or unique ID.
+        claim.UserId = userId;
+
+        // Define the salary limit (adjustable as needed)
+        const decimal salaryLimit = 5000M;
+
+        // Check if claim exceeds limit
+        if (Claim.IsOverLimit(claim.HourlyRate, claim.HoursWorked, salaryLimit))
+        {
+            claim.Status = "Rejected";
+            ModelState.AddModelError(string.Empty, "The claim exceeds the allowed salary limit and has been automatically rejected.");
+        }
+        else
+        {
+            claim.Status = "Pending"; // Default status for valid claims
+        }
 
         if (document != null && document.Length > 0)
         {
@@ -67,7 +83,6 @@ public class ClaimsController : Controller
 
         return RedirectToAction("ClaimSubmitted");
     }
-
 
 
     public IActionResult ClaimSubmitted()
@@ -146,14 +161,23 @@ public class ClaimsController : Controller
     }
 
     [Authorize(Roles = "Coordinator,Manager,Lecturer")]
-
     [HttpGet]
     public async Task<IActionResult> TrackClaims()
     {
         try
         {
-            var allClaims = await _dbContext.Claims.ToListAsync();
-            return View(allClaims);
+            var userId = User.Identity.Name;
+
+            // Admin roles can see all claims
+            if (User.IsInRole("Coordinator") || User.IsInRole("Manager"))
+            {
+                var allClaims = await _dbContext.Claims.ToListAsync();
+                return View(allClaims);
+            }
+
+            // Lecturers see only their claims
+            var userClaims = await _dbContext.Claims.Where(c => c.UserId == userId).ToListAsync();
+            return View(userClaims);
         }
         catch (Exception ex)
         {
@@ -181,5 +205,48 @@ public class ClaimsController : Controller
         }
     }
 
+    [Authorize(Roles = "HR")]
+    [HttpGet]
+    public async Task<IActionResult> HRView()
+    {
+        try
+        {
+            var allClaims = await _dbContext.Claims.ToListAsync();
+            return View(allClaims);
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, "An error occurred while fetching the claims for HR view.");
+            Console.WriteLine(ex.Message);
+            return View("Error");
+        }
+    }
 
+    [Authorize(Roles = "HR")]
+    [HttpGet]
+    public async Task<IActionResult> GenerateClaimReport()
+    {
+        try
+        {
+            // Filter to include only approved claims
+            var approvedClaims = await _dbContext.Claims.Where(c => c.Status == "Approved").ToListAsync();
+
+            // Generate the report content
+            string reportContent = "Claim ID, Lecturer Name, Hours Worked, Hourly Rate, Total Salary, Status\n";
+            foreach (var claim in approvedClaims)
+            {
+                reportContent += $"{claim.Id}, {claim.LecturerName}, {claim.HoursWorked}, {claim.HourlyRate}, {claim.TotalSalary}, {claim.Status}\n";
+            }
+
+            // Return the report as a downloadable file
+            byte[] reportBytes = System.Text.Encoding.UTF8.GetBytes(reportContent);
+            return File(reportBytes, "text/csv", "ApprovedClaimReport.csv");
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, "An error occurred while generating the claim report.");
+            Console.WriteLine(ex.Message);
+            return View("Error");
+        }
+    }
 }

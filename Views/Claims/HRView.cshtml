@@ -1,0 +1,44 @@
+﻿@model IEnumerable<PartTwoProg.Models.Claim>
+
+@{
+    ViewData["Title"] = "HR Claims View";
+}
+
+<h2>HR Claims View</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Lecturer Name</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate</th>
+            <th>Total Salary</th>
+            <th>Status</th>
+            <th>Additional Notes</th>
+            <th>Supporting Document</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.Id</td>
+                <td>@claim.LecturerName</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate.ToString("C")</td>
+                <td>@claim.TotalSalary.ToString("C")</td>
+                <td>@claim.Status</td>
+                <td>@claim.AdditionalNotes</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(claim.SupportingDocument))
+                    {
+                        <a href="@claim.SupportingDocument" target="_blank">View Document</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="GenerateClaimReport" class="btn btn-primary">Download Claim Report</a>
