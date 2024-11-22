@@ -11,7 +11,7 @@
         public string Status { get; set; } = "Pending"; // Initial status
         public string UserId { get; set; } // Link the claim to the user
 
-        // Calculated property
+        // Calculated property.
         public decimal TotalSalary => HoursWorked * HourlyRate;
 
         // Validation logic (static to keep the model clean)
